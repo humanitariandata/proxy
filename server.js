@@ -3,7 +3,7 @@ var httpProxy = require('http-proxy')
 var proxy = httpProxy.createProxy();
 
 var options = {  
-  'digidoc.rodekruis.nl': 'localhost:3000'
+  'digidoc.rodekruis.nl': 'http://localhost:3000'
 }
 
 require('http').createServer(function(req, res) {  
