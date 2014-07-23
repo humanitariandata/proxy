@@ -9,4 +9,4 @@ var server = httpProxy.createServer({
 server.listen(80);
 
 // Logging initialization
-console.log('Application started on port ' + config.sslport);
+console.log('Application started on port 80');
