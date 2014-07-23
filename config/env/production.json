@@ -1,0 +1,10 @@
+{
+  "multipleApplications": true,
+  "forwardingProxy": true,
+  "forwardingProxyPort": 81,
+  "options": {  
+     "digidoc.rodekruis.nl": "http://localhost:3000"
+   },
+   "allowedDomains": "*"
+   
+}
