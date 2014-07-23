@@ -1,18 +1,16 @@
-var httpProxy = require('http-proxy');
+var httpProxy = require('http-proxy')
 
-var options = { router: {
-  'digidoc.rodekruis.nl'  : 'localhost:3000',
-  // default route
-  '.*'                    : 'localhost:3000'
-}}
+var proxy = httpProxy.createProxy();
 
-var router = new httpProxy.RoutingProxy(options);
-var proxy = httpProxy.createServer(function(req,res) {
-    console.log("request: " + req.path + "; method: " + req.method);
-    router.proxyRequest(req,res);
-});
+var options = {  
+  'digidoc.rodekruis.nl': 'localhost:3000'
+}
 
-proxy.listen(80, function() { console.log("Routing proxy listening on " + proxy.address().port); });
+require('http').createServer(function(req, res) {  
+  proxy.web(req, res, {
+    target: options[req.headers.host]
+  });
+}).listen(80);
 
 // Logging initialization
 console.log('Application started on port 80');
