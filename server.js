@@ -35,7 +35,7 @@ var config = require('./config/env/' + process.env.NODE_ENV);
 
 if (config.startHttpProxy) {
    // Create http proxy
-   var proxy = httpProxy.createProxy({target: { protocol: 'http:'}});
+   var proxy = httpProxy.createProxy(); //{target: { protocol: 'http:'}}
    
    // Start http server
    http.createServer(function(req, res) {
@@ -48,10 +48,6 @@ if (config.startHttpProxy) {
    // Listen for the `error` event on `proxy`.
    proxy.on('error', function (err, req, res) {
      console.log('Error from the proxy ' + err);
-   });
-   
-   proxy.on('proxyRes', function (res) {
-      console.log('Response from proxy target');
    });
    
    // Logging initialization
@@ -86,6 +82,15 @@ if (config.startHttpsProxy) {
                                           https: true,
                                           rejectUnauthorized: false
                                           });
+    
+   // Listen for the `error` event on `proxy`.
+   proxySSL.on('error', function (err, req, res) {
+     console.log('Error from the proxy ' + err);
+   });
+   
+   proxySSL.on('proxyRes', function (res) {
+      console.log('Response from proxy target');
+   });
     
     // Create https server to listen to requests
     https.createServer(sslconfig, function(req, res) {
