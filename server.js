@@ -45,6 +45,19 @@ if (config.startHttpProxy) {
      });
    }).listen(config.mainPort);
    
+   // Listen for the `error` event on `proxy`.
+   proxy.on('error', function (err, req, res) {
+     res.writeHead(500, {
+       'Content-Type': 'text/plain'
+     });
+   
+     res.end('Something went wrong in the proxy');
+   });
+   
+   proxy.on('proxyRes', function (res) {
+      console.log('Response from proxy target');
+   });
+   
    // Logging initialization
    console.log('Node application routing proxy started on port ' + config.mainPort);
 }
