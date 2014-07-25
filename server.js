@@ -95,7 +95,7 @@ if (config.startHttpsProxy) {
             ssl: sslconfig,
             secure: false,
             xfwd: true,
-            agent: new Agent({ maxSockets: Infinity })
+            agent: new http.Agent({ maxSockets: Infinity })
          });
     }).listen(config.sslport);
     
