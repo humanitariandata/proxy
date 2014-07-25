@@ -87,18 +87,12 @@ if (config.startHttpsProxy) {
    proxySSL.on('error', function (err, req, res) {
      console.log('Error from the proxy ' + err);
    });
-   
-   proxySSL.on('proxyRes', function (res) {
-      console.log('Response from proxy target');
-   });
-    
+
     // Create https server to listen to requests
     https.createServer(sslconfig, function(req, res) {
       // proxy the requests to the right domain
       proxySSL.web(req, res, {
         target: config.options[req.headers.host],
-        https: true,
-        rejectUnauthorized: false
       });
     }).listen(config.sslport);
     
