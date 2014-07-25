@@ -45,11 +45,6 @@ if (config.startHttpProxy) {
      });
    }).listen(config.mainPort);
    
-   // Listen for the `error` event on `proxy`.
-   proxy.on('error', function (err, req, res) {
-     console.log('Error from the proxy ' + err);
-   });
-   
    // Logging initialization
    console.log('Node application routing proxy started on port ' + config.mainPort);
 }
@@ -78,13 +73,6 @@ if (config.startHttpsProxy) {
     
     // create proxy for SSL requests
     var proxySSL = httpProxy.createProxy();
-    
-
-    
-   // Listen for the `error` event on `proxy`.
-   proxySSL.on('error', function (err, req, res) {
-     console.log('Error from the proxy ' + err);
-   });
 
     // Create https server to listen to requests
     https.createServer(sslconfig, function(req, res) {
