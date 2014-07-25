@@ -11,7 +11,7 @@
      "sapplies.rodekruis.nl:443": "https://localhost:445"
    },
 
-  "startHttpsProxy": false,
+  "startHttpsProxy": true,
   "sslport": 443,
   "key_file": "./config/cert/rodekruis-key.pem",
   "cert_file": "./config/cert/rodekruis-cert.pem"
