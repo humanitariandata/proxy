@@ -47,11 +47,7 @@ if (config.startHttpProxy) {
    
    // Listen for the `error` event on `proxy`.
    proxy.on('error', function (err, req, res) {
-     res.writeHead(500, {
-       'Content-Type': 'text/plain'
-     });
-   
-     res.end('Something went wrong in the proxy');
+     console.log('Error from the proxy ' + err);
    });
    
    proxy.on('proxyRes', function (res) {
