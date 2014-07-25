@@ -2,7 +2,11 @@ var httpProxy = require('http-proxy'),
     http = require('http'),
     url = require('url'),
     glob = require('glob'),
-    request = require('request');
+    request = require('request'),
+    https = require('https'),
+    fs = require('fs'),
+    secrets = require('./config/secrets'),
+    path = require('path');
     
     /**
      * Before we begin, lets set the environment variable
@@ -26,71 +30,64 @@ var httpProxy = require('http-proxy'),
     	console.log('\x1b[0m');
     });
 
+// Get production or development config
 var config = require('./config/env/' + process.env.NODE_ENV);
 
-if (config.multipleApplications) {
-   var proxy = httpProxy.createProxy();
- 
-   http.createServer(function(req, res) {  
+if (config.startHttpProxy) {
+   // Create http proxy
+   var proxy = httpProxy.createProxy({target: { protocol: 'http:'}});
+   
+   // Start http server
+   http.createServer(function(req, res) {
+     // proxy requests to the target url that matches the current request url
      proxy.web(req, res, {
        target: config.options[req.headers.host]
      });
-   }).listen(80);
+   }).listen(config.mainPort);
    
    // Logging initialization
-   console.log('Node application routing proxy started on port 80');
+   console.log('Node application routing proxy started on port ' + config.mainPort);
 }
 
-if (config.forwardingProxy) {
-   //
-   // Create a proxy server which handles GIS proxy requests to remote servers
-   //
-   //var forwardingProxy = httpProxy.createProxyServer({target: { protocol: 'http:' }});
-   
-   //
-   // Create your custom server and just call `proxy.web()` to proxy
-   // a web request to the target passed in the options
-   // also you can use `proxy.ws()` to proxy a websockets request
-   //
-   var server = http.createServer(function(req, res) {
-      // You can define here your custom logic to handle the request
-      // and then proxy the request.
-     
-      var parameters = url.parse(req.url,true).query;
-     
-      
-      request.get(decodeURIComponent(parameters.url), function (error, response, body) {
-         if (!error && response.statusCode == 200) {
-            res.setHeader('Access-Control-Allow-Origin', config.allowedDomains);
-            res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-            res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-	    res.end(body, 'utf-8');
-         }
+// set certicicates and start SSL server
+if (config.startHttpsProxy) {
+    
+    // prepare config with ssl keys and settings
+    var sslconfig = {};
+    if(config.hasOwnProperty('pfx_file')){
+        sslconfig.pfx = fs.readFileSync(path.resolve(__dirname, config.pfx_file), 'UTF-8');
+    }
+    else if (config.hasOwnProperty('key_file') && config.hasOwnProperty('cert_file')){
+        sslconfig.key = fs.readFileSync(path.resolve(__dirname, config.key_file), 'UTF-8');
+        sslconfig.cert = fs.readFileSync(path.resolve(__dirname, config.cert_file), 'UTF-8');
+    }
+    
+    // set passphrase in config
+    if(secrets.certificate.passphrase) {
+      sslconfig.passphrase = secrets.certificate.passphrase;
+    }
+    
+    // Setting for self signed certificate
+    sslconfig.rejectUnauthorized = false;
+    sslconfig.secure = true;
+    
+    // create proxy for SSL requests
+    var proxySSL = httpProxy.createProxy({
+                                          target: { protocol: 'https:'},
+                                          https: true,
+                                          rejectUnauthorized: false
+                                          });
+    
+    // Create https server to listen to requests
+    https.createServer(sslconfig, function(req, res) {
+      // proxy the requests to the right domain
+      proxySSL.web(req, res, {
+        target: config.options[req.headers.host],
+        https: true,
+        rejectUnauthorized: false
       });
-           
-     //forwardingProxy.web(req, res, { forward: parameters.url });
-   });
-   
-   server.listen(config.forwardingProxyPort);
-   /*
-   //
-   // Listen for the `error` event on `forwardingProxy`.
-   forwardingProxy.on('error', function (err, req, res) {
-     res.writeHead(500, {
-       'Content-Type': 'text/plain'
-     });
-   
-     res.end('Something went wrong with passing the request url through the proxy.');
-   });
-   
-   //
-   // Listen for the `proxyRes` event on `forwardingProxy`.
-   //
-   forwardingProxy.on('proxyRes', function (res) {
-     console.log('RAW Response from the target', JSON.stringify(res.headers, true, 2));
-   });
-   */
-   
-   console.log("Forwarding proxy listening on port " + config.forwardingProxyPort);
+    }).listen(config.sslport);
+    
+    // Logging initialization
+    console.log('Node application routing proxy SSL started on port ' + config.sslport);
 }

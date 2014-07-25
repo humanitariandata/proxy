@@ -1,9 +1,16 @@
 {
-  "multipleApplications": false,
-  "forwardingProxy": true  ,
-  "forwardingProxyPort": 81,
+  "multipleApplications": true,
+  "allowedDomains": "*",
+  "mainPort": 80,
+  
+  "startHttpProxy": true,
   "options": {  
-     "digidoc.rodekruis.nl": "http://localhost:3000"
+     "localhost": "http://localhost:3000",
+     "localhost:443": "https://localhost:444"
    },
-   "allowedDomains": "*"
+
+  "startHttpsProxy": true,
+  "sslport": 443,
+  "key_file": "./config/cert/localhost-key.pem",
+  "cert_file": "./config/cert/localhost-cert.pem"
 }
