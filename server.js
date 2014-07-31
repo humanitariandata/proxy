@@ -61,6 +61,10 @@ if (config.startHttpsProxy) {
         sslconfig.key = fs.readFileSync(path.resolve(__dirname, config.key_file), 'UTF-8');
         sslconfig.cert = fs.readFileSync(path.resolve(__dirname, config.cert_file), 'UTF-8');
     }
+
+    if(config.hasOwnProperty('ca_file')){
+              sslconfig.ca = fs.readFileSync(path.resolve(__dirname, config.ca_file), 'UTF-8');
+    }
     
     // set passphrase in config
     if(secrets.certificate.passphrase) {
