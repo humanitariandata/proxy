@@ -6,7 +6,6 @@
   "startHttpProxy": true,
   "options": {  
      "digidoc.rodekruis.nl": "http://localhost:3000",
-     "sapplies.rodekruis.nl": "http://localhost:3001",
      "digidoc.rodekruis.nl:443": "https://localhost:444",
      "sapplies.rodekruis.nl:443": "https://localhost:445"
    },
