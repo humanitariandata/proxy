@@ -4,10 +4,10 @@
   "mainPort": 80,
   
   "startHttpProxy": true,
-  "options": {  
+  "options": {
+     "sapplies.rodekruis.nl:443": "https://localhost:445",
      "digidoc.rodekruis.nl": "http://localhost:3000",
-     "digidoc.rodekruis.nl:443": "https://localhost:444",
-     "sapplies.rodekruis.nl": "https://localhost:445"
+     "digidoc.rodekruis.nl:443": "https://localhost:444"
    },
 
   "startHttpsProxy": true,
