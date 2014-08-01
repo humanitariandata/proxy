@@ -58,6 +58,14 @@ if (config.startHttpProxy) {
       }
    }).listen(config.mainPort);
    
+   proxy.on('error', function(e) {
+      console.log('ERROR RESPONSE: ' + e);
+    });
+   
+   proxy.on('proxyRes', function (res) {
+      console.log('RAW Response from the target', JSON.stringify(res.headers, true, 2));
+   });
+   
    // Logging initialization
    console.log('Node application routing proxy started on port ' + config.mainPort);
 }
@@ -117,6 +125,10 @@ if (config.startHttpsProxy) {
     
     proxySSL.on('error', function(e) {
       console.log(e);
+    });
+    
+    proxySSL.on('proxyRes', function (res) {
+      console.log('RAW Response from the target', JSON.stringify(res.headers, true, 2));
     });
     
     // Logging initialization

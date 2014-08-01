@@ -2,7 +2,7 @@
   "multipleApplications": true,
   "allowedDomains": "*",
   "mainPort": 80,
-  "startHttpProxy": false,
+  "startHttpProxy": true,
   "httpsTargets": [
     {
       "targetPort": 81,
@@ -34,10 +34,10 @@
       "targetPort": 81,
       "target": "http://localhost",
       "sourcePort": 80,
-      "source": "localhost"
+      "source": "digidoc.redcross.nl"
     }
   ],
-  "startHttpsProxy": true,
+  "startHttpsProxy": false,
   "sslport": 443,
   "key_file": "./config/cert/localhost-key.pem",
   "cert_file": "./config/cert/localhost-cert.pem"

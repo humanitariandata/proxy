@@ -3,7 +3,7 @@
   "allowedDomains": "*",
   "mainPort": 80,
   
-  "startHttpProxy": false,
+  "startHttpsProxy": false,
   "httpsTargets": [
     {
       "targetPort": 445,
@@ -18,23 +18,25 @@
       "source": "digidoc.rodekruis.nl"
     }
   ],
+  
+  "startHttpProxy": true,
   "httpTargets": [
     {
-      "targetPort": 82,
-      "target": "https://localhost",
+      "targetPort": 3001,
+      "target": "http://localhost",
       "sourcePort": 80,
       "source": "sapplies.rodekruis.nl"
     },
     {
-      "targetPort": 81,
-      "target": "https://localhost",
+      "targetPort": 3000,
+      "target": "http://localhost",
       "sourcePort": 80,
       "source": "digidoc.rodekruis.nl"
     }
   ], 
-  "startHttpsProxy": true,
+  
   "sslport": 443,
   "key_file": "./config/cert/rodekruis-key.pem",
   "cert_file": "./config/cert/rodekruis-cert.pem",
-  "ca_file": "./config/cert/rodekruis-ca.crt"
+  //"ca_file": "./config/cert/rodekruis-ca.crt"
 }
