@@ -2,43 +2,16 @@
   "multipleApplications": true,
   "allowedDomains": "*",
   "mainPort": 80,
+  
   "startHttpProxy": true,
-  "httpsTargets": [
-    {
-      "targetPort": 81,
-      "target": "https://localhost",
-      "sourcePort": 80,
-      "source": "localhost"
-    },
-    {
-      "targetPort": 445,
-      "target": "https://localhost",
-      "sourcePort": 443,
-      "source": "localhost"
-    },
-    {
-      "targetPort": 444,
-      "target": "https://localhost",
-      "sourcePort": 443,
-      "source": "localhost"
-    },
-    {
-      "targetPort": 444,
-      "target": "https://localhost",
-      "sourcePort": 443,
-      "source": "digidoc.redcross.nl"
-    }
-  ],
-  "httpTargets": [
-    {
-      "targetPort": 81,
-      "target": "http://localhost",
-      "sourcePort": 80,
-      "source": "digidoc.redcross.nl"
-    }
-  ],
-  "startHttpsProxy": false,
+  "options": {  
+     "localhost": "http://localhost:3000",
+     "localhost:443": "https://localhost:444"
+   },
+
+  "startHttpsProxy": true,
   "sslport": 443,
   "key_file": "./config/cert/localhost-key.pem",
-  "cert_file": "./config/cert/localhost-cert.pem"
+  "cert_file": "./config/cert/localhost-cert.pem",
+  "ca_file": './config/cert/localhost-ca.crt'
 }

@@ -6,8 +6,7 @@ var httpProxy = require('http-proxy'),
     https = require('https'),
     fs = require('fs'),
     secrets = require('./config/secrets'),
-    path = require('path'),
-    _ = require('underscore');
+    path = require('path');
     
     /**
      * Before we begin, lets set the environment variable
@@ -41,30 +40,10 @@ if (config.startHttpProxy) {
    // Start http server
    http.createServer(function(req, res) {
      // proxy requests to the target url that matches the current request url
-     
-      var conf = {}; 
-      for (var i in config.httpTargets) {
-         var c = config.httpTargets[i];
-         if (c.source === req.headers.host && c.sourcePort === config.m) {
-            conf.target = c.target;
-            conf.targetPort = c.targetPort;
-         }
-      }
-      
-      if (!_.isEmpty(conf)) {
-         proxy.web(req, res, {
-           target: conf.target + ':' + conf.targetPort
-         });
-      }
+     proxy.web(req, res, {
+       target: config.options[req.headers.host]
+     });
    }).listen(config.mainPort);
-   
-   proxy.on('error', function(e) {
-      console.log('ERROR RESPONSE: ' + e);
-    });
-   
-   proxy.on('proxyRes', function (res) {
-      console.log('RAW Response from the target', JSON.stringify(res.headers, true, 2));
-   });
    
    // Logging initialization
    console.log('Node application routing proxy started on port ' + config.mainPort);
@@ -94,6 +73,7 @@ if (config.startHttpsProxy) {
     
     // Setting for self signed certificate
     sslconfig.rejectUnauthorized = false;
+    sslconfig.secure = true;
     
     // create proxy for SSL requests
     var proxySSL = httpProxy.createProxy();
@@ -101,35 +81,15 @@ if (config.startHttpsProxy) {
     // Create https server to listen to requests
     https.createServer(sslconfig, function(req, res) {
       // proxy the requests to the right domain
-      
-      var conf = {}; 
-      for (var i in config.httpsTargets) {
-         var c = config.httpsTargets[i];
-         if (c.source === req.headers.host && c.sourcePort === config.sslport) {
-            conf.target = c.target;
-            conf.targetPort = c.targetPort;
-         }
-      }
-      
-      if (!_.isEmpty(conf)) {
-         proxySSL.web(req, res,
-            {
-               target: conf.target + ':' + conf.targetPort,
-               ssl: sslconfig,
-               secure: false,
-               xfwd: true,
-               agent: new https.Agent({ maxSockets: Infinity })
-            });
-      }
+      proxySSL.web(req, res,
+         {
+            target: config.options[req.headers.host],
+            ssl: sslconfig,
+            secure: false,
+            xfwd: true,
+            agent: new https.Agent({ maxSockets: Infinity })
+         });
     }).listen(config.sslport);
-    
-    proxySSL.on('error', function(e) {
-      console.log(e);
-    });
-    
-    proxySSL.on('proxyRes', function (res) {
-      console.log('RAW Response from the target', JSON.stringify(res.headers, true, 2));
-    });
     
     // Logging initialization
     console.log('Node application routing proxy SSL started on port ' + config.sslport);
