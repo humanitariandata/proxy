@@ -6,7 +6,8 @@ var httpProxy = require('http-proxy'),
     https = require('https'),
     fs = require('fs'),
     secrets = require('./config/secrets'),
-    path = require('path');
+    path = require('path'),
+    _ = require('underscore');
     
     /**
      * Before we begin, lets set the environment variable
@@ -40,9 +41,21 @@ if (config.startHttpProxy) {
    // Start http server
    http.createServer(function(req, res) {
      // proxy requests to the target url that matches the current request url
-     proxy.web(req, res, {
-       target: config.options[req.headers.host]
-     });
+     
+      var conf = {}; 
+      for (var i in config.httpTargets) {
+         var c = config.httpTargets[i];
+         if (c.source === req.headers.host && c.sourcePort === config.m) {
+            conf.target = c.target;
+            conf.targetPort = c.targetPort;
+         }
+      }
+      
+      if (!_.isEmpty(conf)) {
+         proxy.web(req, res, {
+           target: conf.target + ':' + conf.targetPort   
+         });
+      }
    }).listen(config.mainPort);
    
    // Logging initialization
@@ -75,22 +88,16 @@ if (config.startHttpsProxy) {
     sslconfig.rejectUnauthorized = false;
     sslconfig.secure = true;
     
-    // create proxy for SSL requests
-    var proxySSL = httpProxy.createProxy();
-
-    // Create https server to listen to requests
-    https.createServer(sslconfig, function(req, res) {
-      // proxy the requests to the right domain
-      proxySSL.web(req, res,
-         {
-            target: config.options[req.headers.host],
-            ssl: sslconfig,
-            secure: false,
-            xfwd: true,
-            agent: new http.Agent({ maxSockets: Infinity })
-         });
-    }).listen(config.sslport);
-    
+    var options = {};
+    options.https = sslconfig;
+    options.hostnameOnly = true,
+    options.router = {
+      'sapplies.rodekruis.nl': 'localhost:445',
+      'digidoc.rodekruis.nl' : 'localhost:444'
+    };
+       
+   httpProxy.createServer(options).listen(config.sslport);
+   
     // Logging initialization
     console.log('Node application routing proxy SSL started on port ' + config.sslport);
 }
