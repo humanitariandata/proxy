@@ -3,7 +3,7 @@
   "allowedDomains": "*",
   "mainPort": 80,
   
-  "startHttpProxy": true,
+  "startHttpProxy": false,
   "httpsTargets": [
     {
       "targetPort": 445,

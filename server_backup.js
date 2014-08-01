@@ -53,7 +53,7 @@ if (config.startHttpProxy) {
       
       if (!_.isEmpty(conf)) {
          proxy.web(req, res, {
-           target: conf.target + ':' + conf.targetPort
+           target: conf.target + ':' + conf.targetPort   
          });
       }
    }).listen(config.mainPort);
@@ -88,38 +88,22 @@ if (config.startHttpsProxy) {
     sslconfig.rejectUnauthorized = false;
     sslconfig.secure = true;
     
-    // create proxy for SSL requests
-    var proxySSL = httpProxy.createProxy();
-
-    // Create https server to listen to requests
-    https.createServer(sslconfig, function(req, res) {
-      // proxy the requests to the right domain
-      
-      var conf = {}; 
-      for (var i in config.httpsTargets) {
-         var c = config.httpsTargets[i];
-         if (c.source === req.headers.host && c.sourcePort === config.sslport) {
-            conf.target = c.target;
-            conf.targetPort = c.targetPort;
-         }
-      }
-      
-      if (!_.isEmpty(conf)) {
-         proxySSL.web(req, res,
-            {
-               target: conf.target + ':' + conf.targetPort,
-               ssl: sslconfig,
-               secure: false,
-               xfwd: true,
-               agent: new http.Agent({ maxSockets: Infinity })
-            });
-      }
-    }).listen(config.sslport);
+    var options = {};
+    options.ssl = sslconfig;
+    options.hostnameOnly = true,
+    options.router = {
+      'sapplies.redcross.nl': 'localhost:445',
+      'digidoc.redcross.nl' : 'localhost:444'
+    };
     
-    proxySSL.on('error', function(e) {
-      console.log(e);
-    });
+    options.target = { protocol: 'https:'};
     
+    //options.secure= true;
+    options.xfwd= true;
+    options.agent= new http.Agent({ maxSockets: Infinity });
+       
+   httpProxy.createServer(options).listen(config.sslport);
+   
     // Logging initialization
     console.log('Node application routing proxy SSL started on port ' + config.sslport);
 }

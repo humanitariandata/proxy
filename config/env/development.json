@@ -2,7 +2,7 @@
   "multipleApplications": true,
   "allowedDomains": "*",
   "mainPort": 80,
-  "startHttpProxy": true,
+  "startHttpProxy": false,
   "httpsTargets": [
     {
       "targetPort": 81,
@@ -21,6 +21,12 @@
       "target": "https://localhost",
       "sourcePort": 443,
       "source": "localhost"
+    },
+    {
+      "targetPort": 444,
+      "target": "https://localhost",
+      "sourcePort": 443,
+      "source": "digidoc.redcross.nl"
     }
   ],
   "httpTargets": [
