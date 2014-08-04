@@ -1,2 +1,3 @@
 config/secrets.json
 config/cert/*.pem
+config/cert/*.ca

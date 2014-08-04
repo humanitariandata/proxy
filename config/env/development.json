@@ -12,6 +12,5 @@
   "startHttpsProxy": true,
   "sslport": 443,
   "key_file": "./config/cert/localhost-key.pem",
-  "cert_file": "./config/cert/localhost-cert.pem",
-  "ca_file": './config/cert/localhost-ca.crt'
+  "cert_file": "./config/cert/localhost-cert.pem"
 }
