@@ -72,7 +72,7 @@ if (config.startHttpsProxy) {
     }
     
     // Setting for self signed certificate
-    sslconfig.rejectUnauthorized = false;
+    sslconfig.rejectUnauthorized = true;
     sslconfig.secure = true;
     
     // create proxy for SSL requests
