@@ -6,8 +6,15 @@ var httpProxy = require('http-proxy'),
     https = require('https'),
     fs = require('fs'),
     secrets = require('./config/secrets'),
-    path = require('path');
-    
+    path = require('path'),
+    nodemailer = require('nodemailer'),
+    previousErrorTime = new Date() - 3600000;
+
+   /**
+    * Set nodemailer transporter
+    */
+   var mailer = nodemailer.createTransport(secrets.smtpServer);
+   
     /**
      * Before we begin, lets set the environment variable
      * We'll Look for a valid NODE_ENV variable and if one cannot be found load the development NODE_ENV
@@ -44,6 +51,34 @@ if (config.startHttpProxy) {
        target: config.options[req.headers.host]
      });
    }).listen(config.mainPort);
+   
+   proxy.on('error', function (err, req, res) {
+      // check previous time error was sent by email
+      var currentErrorTime = new Date();
+      var diff = currentErrorTime - previousErrorTime;
+      
+      if (diff > 3600000) {
+         previousErrorTime = currentErrorTime;
+      
+         mailer.sendMail({
+               from: secrets.smtpServer.auth.user,
+               to: secrets.mailingAddressRecipient,
+               subject: 'Proxy Error',
+               text: 'Site seems to be down: ' + req.headers.host + ', Error: ' + err
+            },
+            function(error, info){
+               if(error){
+                     console.log(error);
+               }else{
+                     console.log('Message sent: ' + info.response);
+               }
+            }
+         );
+      }
+      console.log("Error:", err);
+      
+      res.end();
+    });
    
    // Logging initialization
    console.log('Node application routing proxy started on port ' + config.mainPort);
@@ -90,6 +125,34 @@ if (config.startHttpsProxy) {
             agent: new http.Agent({ maxSockets: Infinity })
          });
     }).listen(config.sslport);
+    
+   proxySSL.on('error', function (err, req, res) {
+      // check previous time error was sent by email
+      var currentErrorTime = new Date();
+      var diff = currentErrorTime - previousErrorTime;
+      
+      if (diff > 3600000) {
+         previousErrorTime = currentErrorTime;
+      
+         mailer.sendMail({
+               from: secrets.smtpServer.auth.user,
+               to: secrets.mailingAddressRecipient,
+               subject: 'Proxy Error',
+               text: 'Site seems to be down: ' + req.headers.host + ', Error: ' + err
+            },
+            function(error, info){
+               if(error){
+                     console.log(error);
+               }else{
+                     console.log('Message sent: ' + info.response);
+               }
+            }
+         );
+      }
+      console.log("Error:", err);
+      
+      res.end();
+    });
     
     // Logging initialization
     console.log('Node application routing proxy SSL started on port ' + config.sslport);
