@@ -9,7 +9,7 @@
      "sapplies.rodekruis.nl": "http://localhost:3001",
      "digidoc.rodekruis.nl:443": "https://localhost:444",
      "sapplies.rodekruis.nl:443": "https://localhost:445",
-     "digidoc.rodekruis.nl:8080": "http://localhost:8080",
+     "digidoc.rodekruis.nl:8080": "http://localhost:8080"
    },
 
   "startHttpsProxy": true,
