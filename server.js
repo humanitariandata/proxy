@@ -59,21 +59,25 @@ if (config.startHttpProxy) {
       
       if (diff > 3600000) {
          previousErrorTime = currentErrorTime;
-      
-         mailer.sendMail({
-               from: secrets.smtpServer.auth.user,
-               to: secrets.mailingAddressRecipient,
-               subject: 'Proxy Error',
-               text: 'Site seems to be down: ' + req.headers.host + ', Error: ' + err
-            },
-            function(error, info){
-               if(error){
-                     console.log(error);
-               }else{
-                     console.log('Message sent: ' + info.response);
+         
+         // check if error thrown is a connection reset error, indicating the application server is down
+         if (err.indexOf("ECONNRESET") > -1) {
+
+            mailer.sendMail({
+                  from: secrets.smtpServer.auth.user,
+                  to: secrets.mailingAddressRecipient,
+                  subject: 'Proxy Error',
+                  text: 'Site seems to be down: ' + req.headers.host + ', Error: ' + err
+               },
+               function(error, info){
+                  if(error){
+                        console.log(error);
+                  }else{
+                        console.log('Message sent: ' + info.response);
+                  }
                }
-            }
-         );
+            );
+         }     
       }
       console.log("Error:", err);
       
@@ -134,20 +138,24 @@ if (config.startHttpsProxy) {
       if (diff > 3600000) {
          previousErrorTime = currentErrorTime;
       
-         mailer.sendMail({
-               from: secrets.smtpServer.auth.user,
-               to: secrets.mailingAddressRecipient,
-               subject: 'Proxy Error',
-               text: 'Site seems to be down: ' + req.headers.host + ', Error: ' + err
-            },
-            function(error, info){
-               if(error){
-                     console.log(error);
-               }else{
-                     console.log('Message sent: ' + info.response);
+         // check if error thrown is a connection reset error, indicating the application server is down
+         if (err.indexOf("ECONNRESET") > -1) {
+
+            mailer.sendMail({
+                  from: secrets.smtpServer.auth.user,
+                  to: secrets.mailingAddressRecipient,
+                  subject: 'Proxy Error',
+                  text: 'Site seems to be down: ' + req.headers.host + ', Error: ' + err
+               },
+               function(error, info){
+                  if(error){
+                        console.log(error);
+                  }else{
+                        console.log('Message sent: ' + info.response);
+                  }
                }
-            }
-         );
+            );
+         } 
       }
       console.log("Error:", err);
       
