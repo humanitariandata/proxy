@@ -8,7 +8,9 @@ var httpProxy = require('http-proxy'),
     secrets = require('./config/secrets'),
     path = require('path'),
     nodemailer = require('nodemailer'),
-    previousErrorTime = new Date() - 3600000;
+    previousErrorTime = new Date() - 3600000,
+    constants = require('constants'),
+    tls = require('tls');
 
    /**
     * Set nodemailer transporter
@@ -127,6 +129,8 @@ if (config.startHttpsProxy) {
     // Setting for self signed certificate
     sslconfig.rejectUnauthorized = true;
     sslconfig.secure = true;
+    sslconfig.secureProtocol = 'SSLv23_method';
+    sslconfig.secureOptions = constants.SSL_OP_NO_SSLv3;
     
     // create proxy for SSL requests
     var proxySSL = httpProxy.createProxy();
