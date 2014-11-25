@@ -45,12 +45,12 @@ if (config.startHttpProxy) {
    var proxy = httpProxy.createProxy({target: { protocol: 'http:'}});
    
    // Start http server
-   http.createServer(function(req, res) {
+   var httpServer = http.createServer(function(req, res) {
      // proxy requests to the target url that matches the current request url
      proxy.web(req, res, {
        target: config.options[req.headers.host]
      });
-   }).listen(config.mainPort);
+   });
    
    proxy.on('error', function (err, req, res) {
       // check previous time error was sent by email
@@ -61,7 +61,7 @@ if (config.startHttpProxy) {
          previousErrorTime = currentErrorTime;
          
          // check if error thrown is a connection reset error, indicating the application server is down
-         if (err.indexOf("ECONNRESET") > -1) {
+         if ((err instanceof Array && err.indexOf("ECONNRESET") > -1) || (err instanceof String && err === "ECONNREFUSED")) {
 
             mailer.sendMail({
                   from: secrets.smtpServer.auth.user,
@@ -84,8 +84,11 @@ if (config.startHttpProxy) {
       res.end();
     });
    
-   // Logging initialization
-   console.log('Node application routing proxy started on port ' + config.mainPort);
+   httpServer.on('listening',function(){
+        console.log('ok, http server is running on port ' + config.mainPort);
+    });
+   
+   httpServer.listen(config.mainPort);
 }
 
 // set certicicates and start SSL server
@@ -101,7 +104,13 @@ if (config.startHttpsProxy) {
         sslconfig.cert = fs.readFileSync(path.resolve(__dirname, config.cert_file), 'UTF-8');
     }
     
-    if(config.hasOwnProperty('ca_file') && config.hasOwnProperty('ca2_file')){
+    if(config.hasOwnProperty('ca_file') && config.hasOwnProperty('ca2_file') && config.hasOwnProperty('ca3_file')){
+              sslconfig.ca = [
+			      fs.readFileSync(path.resolve(__dirname, config.ca_file), 'UTF-8'),
+			      fs.readFileSync(path.resolve(__dirname, config.ca2_file), 'UTF-8'),
+                              fs.readFileSync(path.resolve(__dirname, config.ca3_file), 'UTF-8')
+			     ];
+    } else if(config.hasOwnProperty('ca_file') && config.hasOwnProperty('ca2_file')){
               sslconfig.ca = [
 			      fs.readFileSync(path.resolve(__dirname, config.ca_file), 'UTF-8'),
 			      fs.readFileSync(path.resolve(__dirname, config.ca2_file), 'UTF-8')
@@ -123,7 +132,7 @@ if (config.startHttpsProxy) {
     var proxySSL = httpProxy.createProxy();
 
     // Create https server to listen to requests
-    https.createServer(sslconfig, function(req, res) {
+    var sslServer = https.createServer(sslconfig, function(req, res) {
       // proxy the requests to the right domain
       proxySSL.web(req, res,
          {
@@ -133,8 +142,8 @@ if (config.startHttpsProxy) {
             xfwd: true,
             agent: new http.Agent({ maxSockets: Infinity })
          });
-    }).listen(config.sslport);
-    
+    });
+       
    proxySSL.on('error', function (err, req, res) {
       // check previous time error was sent by email
       var currentErrorTime = new Date();
@@ -144,7 +153,7 @@ if (config.startHttpsProxy) {
          previousErrorTime = currentErrorTime;
       
          // check if error thrown is a connection reset error, indicating the application server is down
-         if (err.indexOf("ECONNRESET") > -1) {
+         if ((err instanceof Array && err.indexOf("ECONNRESET") > -1) || (err instanceof String && err === "ECONNREFUSED")) {
 
             mailer.sendMail({
                   from: secrets.smtpServer.auth.user,
@@ -166,7 +175,12 @@ if (config.startHttpsProxy) {
       
       res.end();
     });
+   
+    // Add listening to server
+    sslServer.on('listening',function(){
+        console.log('ok, https server is running on port ' + config.sslport);
+    });
     
-    // Logging initialization
-    console.log('Node application routing proxy SSL started on port ' + config.sslport);
+    // Start server
+    sslServer.listen(config.sslport);
 }
