@@ -9,7 +9,8 @@
      "sapplies.rodekruis.nl": "http://localhost:3001",
      "digidoc.rodekruis.nl:443": "https://localhost:444",
      "sapplies.rodekruis.nl:443": "https://localhost:445",
-     "geodata.rodekruis.nl": "http://localhost:8080"
+     "geonode.rodekruis.nl": "http://localhost:8000",
+     "geonode.rodekruis.nl:443": "https://localhost:8001"
    },
 
   "startHttpsProxy": true,
