@@ -6,11 +6,11 @@
   "startHttpProxy": true,
   "options": {  
      "digidoc.rodekruis.nl": "http://localhost:3000",
-     "sapplies.rodekruis.nl": "http://localhost:3001",
+     //"sapplies.rodekruis.nl": "http://localhost:3001",
      "digidoc.rodekruis.nl:443": "https://localhost:444",
-     "sapplies.rodekruis.nl:443": "https://localhost:445",
-     "geonode.rodekruis.nl": "http://localhost:8000",
-     "geonode.rodekruis.nl:443": "https://localhost:8001"
+     //"sapplies.rodekruis.nl:443": "https://localhost:445",
+     "sapplies.rodekruis.nl": "http://localhost:3010",
+     "sapplies.rodekruis.nl:443": "https://localhost:3011"
    },
 
   "startHttpsProxy": true,
